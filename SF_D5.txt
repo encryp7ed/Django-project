@@ -1,0 +1,101 @@
+from news.models import *
+user1 = User.objects.create_user(username='Someone')
+user2 = User.objects.create_user(username='Somebody')
+
+author1 = Author.objects.create(user=user1)
+author2 = Author.objects.create(user=user2)
+
+category1 = Category.objects.create(name='space')
+category2 = Category.objects.create(name='sports')
+category3 = Category.objects.create(name='science')
+category4 = Category.objects.create(name='swords')
+
+post1 = Post.objects.create(title='NASA Selects ACMI as Second Approved Exploration Park Facility',
+content='NASA and the American Center for Manufacturing and Innovation (ACMI) signed an agreement Thursday, Feb. 29 to lease underutilized land in a 240-acre Exploration Park at the agency’s Johnson Space Center in Houston. ACMI will enable the development of facilities to enable commercial and defense space manufacturing.',
+author_id=1,
+type = 'N')
+post1.categories.set(['space', 'science'])
+
+post2 = Post.objects.create(title='Swords are romanticized as the most common weapons of war and single combat.',
+content="""Whether you read books, play video games, or tabletop RPG’s, one thing is very common among them; swords. Swords are ubiquitous to the point of being considered the basic weapons of pre-modern melee fighters. I read however that swords historically were much less common in warfare than is widely believed and that the most used weapons tended to be spears, javelins, and other cheaper weapons with a longer reaches that were easier to replace.
+
+Throughout military history, were swords as prevalent as depicted in fiction or is this just a result of romance stories featuring swords as a central symbol (Arthurian legends for instance)?""",
+author_id=2,
+type='A')
+post2.categories.set([category4])
+
+post3 = Post.objects.create(title='Any sports you can get into and actually be really good at it in your late 20s?',
+content="""I was never really an athletic person, and it's really hard for me to get into any kind of physical activity, especially bc I'm naturally competitive but tend to get discouraged if I'm not good at something or if I don't see myself being able to compete or show off(?, not sure what the right term here is, but by show off, i guess i mean more like perform, not flaunt). Like, I need some kind of goal to reach in order for me to get into something.
+
+Things I definitely can't do include running (I used to run like 5-6x a week bc I didn't know of other options for physical activity, and despite doing this for a year, I never got past the "constantly feeling like I'm dying" phase), and most sports with balls.
+
+I'm open to things like martial arts, dance, ice skating, strength training, etc. But I want an idea of what I can realistically achieve. I used to powerlift, but got injured two years ago. Despite consistently training since then, I still haven't recovered my former strength (still training at less than 60% of what I was able to do 2 years ago) and it's discouraging enough that I want to quit""",
+author_id=1,
+type='A')
+post3.categories.set([category2])
+
+comment1 = Comment.objects.create(content="""I know that it's a massive dream in India to work at NASA. I learned about NASA sooner than I did about our own space program, ISRO.""",
+post=post1,
+user=user2)
+
+comment2 = Comment.objects.create(content="""This is not a direct answer to your question, but a caveat that "swords are romanticized as the most common weapons of war and single combat" is itself not universal!
+
+For example, in Indian epics like the Ramayana and the Mahabharata, the bow and not the sword is the primary, celebrated, weapon. The greatest warriors are archers in chariots, and a sword is something a desperate warrior uses when he has lost his chariot and his bow. Some warriors are noted for using a mace (Bhima, Duryodhana), a spear (Shalya, Yudhisthira), or a sword (Sahadeva, Satyaki), but they are very much the exception.
+
+Another example is in the 16th century Prithviraj Raso, a highly romanticized account of the life of Prithviraj Chauhan. Prithviraj, who has been imprisoned and blinded by Muhammad Ghori, kills Ghori by aiming an arrow at the sound of Ghori's voice. Again, archery, not swordsmanship, is celebrated.
+
+So, just as swords were not always the primary weapon of war, neither was their depiction as primary weapons or even as symbols.""",
+post=post2, user=user1)
+
+comment3 = Comment.objects.create(content="""Rock climbing. And I mean like outside rock climbing, not rock climbing walls. It’s a completely different experience. It doesn’t use as much muscle as you’d think. I’m completely out of shape and was the first one to climb to the top of a lead with my rock climbing class last week. It’s all about puzzle solving and how to position and balance your feet. It’s so unbelievably fun.
+
+Edit: I’m 23 btw and new to rock climbing""",
+post=post3, user=user2)
+
+comment4 = Comment.objects.create(content="""Hear me out: Rugby. Very welcoming sport, and most clubs have a handful of players who have never played the sport join each season. Last year, one of our rookies was 40. Really fantastic community and it’s a GREAT workout.""",
+post=post3, user=user2)
+
+post1.like()
+post1.like()
+post1.like()
+post1.dislike()
+
+post2.dislike()
+
+post3.like()
+post3.dislike()
+
+author1.update_rating()
+author2.update_rating()
+
+comment1.like()
+comment1.like()
+
+comment2.like()
+comment2.dislike()
+comment2.like()
+comment2.like()
+
+comment4.dislike()
+
+author1.update_rating()
+author2.update_rating()
+
+
+best = Author.objects.order_by('-rating').first()
+best_user = best_author.user
+best_user.username
+
+best_post = Post.objects.order_by('-rating').first()
+author = best_post.author
+best_post.post_time
+best_author.rating
+best_post.rating
+best_post.title
+best_post.preview()
+
+comments = Comment.objects.filter(post=best_post)
+comments.values('date')
+comments.values('author')
+comments.values('rating')
+comments.values('content')
