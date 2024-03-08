@@ -1,0 +1,45 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+NewsPaper
+{% endblock title %}
+
+{% block content %}
+   <h1>News</h1>
+   <p>Amount of news: {{news|length}}</p>
+   <h3> {{ top_news_of_week|default_if_none:"Пока никаких новых новостей!"|censorship }} </h3>
+   <hr>
+   {% if news %}
+       <table>
+           <tr>
+               <td>Title</td>
+               <td>Date</td>
+               <td>Content</td>
+               <td>Categories</td>
+           </tr>
+
+           <!-- Для каждого товара будете генерироваться новая строчка,
+           т.е. новый HTML код, который указан в теле цикла.
+           При этом сам цикл работает точно так же, как и в Python.
+           product — переменная цикла, т.е. наш товар полученный из списка -->
+           {% for one_news in news %}
+           <tr>
+               <td>{{ one_news.title|censorship }}</td>
+               <td>{{ one_news.post_time|date:'d M Y' }}</td>
+               <td>{{ one_news.content|truncatechars:20|censorship }}</td>
+               <td>
+                   {% for category in one_news.categories.all %}
+                       {{ category.name }}
+                       {% if not forloop.last %}, {% endif %}
+                   {% endfor %}
+               </td>
+           </tr>
+           {% endfor %}
+
+       </table>
+   {% else %}
+       <h2>Новостей нет!</h2>
+   {% endif %}
+{% endblock content %}

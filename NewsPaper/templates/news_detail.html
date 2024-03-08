@@ -1,0 +1,24 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+News
+{% endblock title %}
+
+{% block content %}
+<h1>{{ news_detail.title|censorship }}</h1>
+<p>
+    Категории:
+    {% for category in news_detail.categories.all %}
+        {{ category.name }}{% if not forloop.last %}, {% endif %}
+    {% endfor %}
+</p>
+<p>
+    {{ news_detail.post_time|date:'j M Y' }}
+</p>
+<hr>
+<p>
+    {{ news_detail.content|censorship }}
+</p>
+{% endblock content %}
