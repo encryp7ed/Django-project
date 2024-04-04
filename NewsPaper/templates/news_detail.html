@@ -9,7 +9,7 @@ News
 {% block content %}
 <h1>{{ news_detail.title|censorship }}</h1>
 <p>
-    Категории:
+    Categories:
     {% for category in news_detail.categories.all %}
         {{ category.name }}{% if not forloop.last %}, {% endif %}
     {% endfor %}

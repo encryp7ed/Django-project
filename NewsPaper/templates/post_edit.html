@@ -1,0 +1,16 @@
+{% extends 'flatpages/default.html' %}
+
+{% block content %}
+{# Выводим разные заголовки в зависимости от типа поста #}
+{% if 'news' in request.path %}
+    <h1>News</h1>
+{% elif 'articles' in request.path %}
+    <h1>Articles</h1>
+{% endif %}
+<hr>
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Save" />
+</form>
+{% endblock content %}

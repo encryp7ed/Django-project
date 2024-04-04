@@ -1,14 +1,19 @@
+from django.urls import reverse_lazy
 from datetime import datetime, timedelta
-from django.views.generic import ListView, DetailView
+from django.views.generic import (
+    ListView, DetailView, CreateView, UpdateView, DeleteView
+)
+from .filters import PostFilter
+from .forms import PostForm
 from .models import Post
 
 
 class NewsList(ListView):
     model = Post
-    # Вывод на страницу от "свежих" новостей к более старым
-    ordering = 'post_time'
+    ordering = 'post_time'  # Вывод на страницу от "свежих" новостей к более старым
     template_name = 'news.html'
     context_object_name = 'news'
+    paginate_by = 10  # Отображение не более 10 статей на странице
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -34,3 +39,38 @@ class NewsDetail(DetailView):
     model = Post
     template_name = 'news_detail.html'
     context_object_name = 'news_detail'
+
+
+class PostCreate(CreateView):
+    form_class = PostForm
+    model = Post
+    template_name = 'post_edit.html'
+
+    def form_valid(self, form):
+        # Получаем инстанс модели, не сохраняя его в базу данных
+        instance = form.save(commit=False)
+
+        # Проверяем, откуда отправлен POST-запрос
+        if self.request.path == '/news/create/':
+            # Устанавливаем значение поля в "новость"
+            instance.type = 'news'
+        elif self.request.path == '/articles/create/':
+            # Устанавливаем значение поля в "статья"
+            instance.type = 'article'
+
+        # Сохраняем объект модели с установленным значением поля
+        return super().form_valid(form)
+
+
+class PostUpdate(UpdateView):
+    form_class = PostForm
+    model = Post
+    template_name = 'post_edit.html'
+
+
+class PostDelete(DeleteView):
+    model = Post
+    template_name = 'post_delete.html'
+    success_url = reverse_lazy('news_list')
+
+# class NewsSearch(ListView):

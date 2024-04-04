@@ -1,6 +1,7 @@
 {% extends 'flatpages/default.html' %}
 
 {% load custom_filters %}
+{% load custom_tags %}
 
 {% block title %}
 NewsPaper
@@ -9,37 +10,57 @@ NewsPaper
 {% block content %}
    <h1>News</h1>
    <p>Amount of news: {{news|length}}</p>
-   <h3> {{ top_news_of_week|default_if_none:"Пока никаких новых новостей!"|censorship }} </h3>
+   <h3> {{ top_news_of_week|default_if_none:"No news yet!"|censorship }} </h3>
    <hr>
-   {% if news %}
-       <table>
-           <tr>
-               <td>Title</td>
-               <td>Date</td>
-               <td>Content</td>
-               <td>Categories</td>
-           </tr>
+   {# Создаем блок списка новостей для его вывода на странице news/search #}
+   {% block news %}
+       {% if news %}
+           <table>
+               <tr>
+                   <td>Title</td>
+                   <td>Date</td>
+                   <td>Content</td>
+                   <td>Categories</td>
+               </tr>
 
-           <!-- Для каждого товара будете генерироваться новая строчка,
-           т.е. новый HTML код, который указан в теле цикла.
-           При этом сам цикл работает точно так же, как и в Python.
-           product — переменная цикла, т.е. наш товар полученный из списка -->
-           {% for one_news in news %}
-           <tr>
-               <td>{{ one_news.title|censorship }}</td>
-               <td>{{ one_news.post_time|date:'d M Y' }}</td>
-               <td>{{ one_news.content|truncatechars:20|censorship }}</td>
-               <td>
-                   {% for category in one_news.categories.all %}
-                       {{ category.name }}
-                       {% if not forloop.last %}, {% endif %}
-                   {% endfor %}
-               </td>
-           </tr>
-           {% endfor %}
+               {% for one_news in news %}
+               <tr>
+                   <td>{{ one_news.title|censorship }}</td>
+                   <td>{{ one_news.post_time|date:'d M Y' }}</td>
+                   <td>{{ one_news.content|truncatechars:20|censorship }}</td>
+                   <td>
+                       {% for category in one_news.categories.all %}
+                           {{ category.name }}
+                           {% if not forloop.last %}, {% endif %}
+                       {% endfor %}
+                   </td>
+               </tr>
+               {% endfor %}
 
-       </table>
-   {% else %}
-       <h2>Новостей нет!</h2>
-   {% endif %}
+           </table>
+       {% else %}
+           <h2>Новостей нет!</h2>
+       {% endif %}
+
+       {# Информация о предыдущих страницах #}
+       {% if page_obj.has_previous %}
+           <a href="?{% url_replace page=1 %}">1</a>
+           {% if page_obj.previous_page_number != 1 %}
+               ...
+               <a href="?{% url_replace page=page_obj.previous_page_number %}">{{ page_obj.previous_page_number }}</a>
+           {% endif %}
+       {% endif %}
+
+       {# Информация о текущей странице #}
+       {{ page_obj.number }}
+
+       {# Информация о следующих страницах #}
+       {% if page_obj.has_next %}
+           <a href="?{% url_replace page=page_obj.next_page_number %}">{{ page_obj.next_page_number }}</a>
+           {% if paginator.num_pages != page_obj.next_page_number %}
+               ...
+               <a href="?{% url_replace page=page_obj.paginator.num_pages %}">{{ page_obj.paginator.num_pages }}</a>
+           {% endif %}
+       {% endif %}
+   {% endblock news %}
 {% endblock content %}

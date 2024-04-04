@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 
 class Author(models.Model):
@@ -33,6 +34,8 @@ class Author(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=64, unique=True)
 
+    objects = models.Manager()
+
     def __str__(self):
         return self.name
 
@@ -53,10 +56,6 @@ class Post(models.Model):
     post_time = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=POST_TYPES, default=ARTICLE)
-    category = Category.objects.get(pk=category_id)
-    post.categories.add(category)
-
-
 
     def like(self):
         self.rating += 1
@@ -77,6 +76,10 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    # После её создания, переотправляем пользователя на её страницу
+    def get_absolute_url(self):
+        return reverse('post_detail', args=[str(self.id)])
 
 
 class Comment(models.Model):

@@ -1,0 +1,23 @@
+{% extends 'flatpages/default.html' %}
+
+{% load custom_filters %}
+
+{% block title %}
+NewsPaper
+{% endblock title %}
+
+{% block content %}
+    <h1>News search</h1>
+
+    {# Добавляем форму, которая объединяет набор полей, отправляемые в запросе #}
+    <form action="" method="get">
+        {{ filterset.form.as_p }
+        {# Добавим кнопку отправки данных формы #}
+        <input type="submit" value="Search" />
+    </form>
+
+    {# Добавляем список статей #}
+    {% block news %}
+        {% include 'news.html' %}
+    {% endblock news %}
+{% endblock content %}
