@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News Update:{{ post.title }}</title>
+</head>
+<body>
+    <h2>Hello, {{ post.category.subscribers.username }}. A new post in your favorite category!!</h2>
+    <hr />
+    <p>{{ post.preview }}</p>
+    <p>Read the full post <a href="{{ article_url }}">here</a>.</p>
+</body>
+</html>

@@ -33,11 +33,16 @@ class Author(models.Model):
 
 class Category(models.Model):
     name = models.CharField(max_length=64, unique=True)
+    subscribers = models.ManyToManyField(User, blank=True, null=True, related_name='categories')
 
     objects = models.Manager()
 
     def __str__(self):
         return self.name
+
+    # Возвращаем список всех подписчиков для рассылки
+    def get_subscribers_for_category(self):
+        return self.subscribers.all()
 
 
 class Post(models.Model):
@@ -56,6 +61,8 @@ class Post(models.Model):
     post_time = models.DateTimeField(auto_now_add=True)
     author = models.ForeignKey(Author, on_delete=models.CASCADE)
     type = models.CharField(max_length=1, choices=POST_TYPES, default=ARTICLE)
+
+    objects = models.Manager()
 
     def like(self):
         self.rating += 1

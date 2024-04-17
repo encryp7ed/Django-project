@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Articles for the week</title>
+</head>
+<body>
+    <h2>Hello, {{ post.category.subscribers.username }}. News for the week in your favorite categories!</h2>
+    <hr />
+    <ul>
+        {% for post in posts %}
+            <li><a href='{{ link }}{{ post.get_absolute_url }}'>{{ post.title }} </a></li>
+        {% endfor %}
+    </ul>
+</body>
+</html>

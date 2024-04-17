@@ -34,6 +34,13 @@ class NewsList(ListView):
             top_news_of_week = None
 
         context['top_news_of_week'] = f"Новость недели: {top_news_of_week}"
+
+        # Получаем выбранные категории из формы
+        form = PostForm(self.request.GET)
+        if form.is_valid():
+            selected_categories = form.cleaned_data['categories']
+            context['selected_categories'] = selected_categories
+
         return context
 
 

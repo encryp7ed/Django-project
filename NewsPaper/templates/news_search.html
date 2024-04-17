@@ -16,6 +16,21 @@ NewsPaper
         <input type="submit" value="Search" />
     </form>
 
+    {# Добавляем кнопку подписки на каждую категорию #}
+    {% for category in categories %}
+        {% if category in subscribed_categories %}
+            <form action="{% url 'unsubscribe_category' category.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Unsubscribe on {{ category.name }}">
+            </form>
+        {% else %}
+            <form action="{% url 'subscribe_category' category.id %}" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Subscribe on {{ category.name }}">
+            </form>
+        {% endif %}
+    {% endfor %}
+
     {# Добавляем список статей #}
     {% block news %}
         {% include 'news.html' %}
