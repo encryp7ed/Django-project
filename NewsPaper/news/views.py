@@ -8,6 +8,7 @@ from django.contrib.auth.mixins import PermissionRequiredMixin
 
 from .forms import PostForm
 from .models import Post
+from .tasks import send_news_notification
 
 
 class NewsList(ListView):
@@ -69,7 +70,12 @@ class PostCreate(PermissionRequiredMixin, CreateView):
             instance.type = 'article'
 
         # Сохраняем объект модели с установленным значением поля
-        return super().form_valid(form)
+        response = super().form_valid(form)
+
+        # Отправляем уведомление подписчикам
+        send_news_notification.delay(self.object.id)
+
+        return response
 
 
 class PostUpdate(PermissionRequiredMixin, UpdateView):

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
+import redis
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -198,3 +199,14 @@ EMAIL_USE_SSL = True
 # Настройки apscheduler
 APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
 APSCHEDULER_RUN_NOW_TIMEOUT = 25  # Seconds
+
+# Настройки Redis
+red = redis.Redis(
+    host='redis-13229.c17.us-east-1-4.ec2.redns.redis-cloud.com',
+    port=13229,
+    password=os.getenv('REDIS_PASSWORD')
+)
+
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+CELERY_IMPORTS = ('news.tasks', )
