@@ -23,7 +23,7 @@ def subscribe_category(request):
     return render(request, 'news_search.html', context)
 
 
-# Посписка на категории
+# Подсписка на категории
 @login_required
 def subscribers(request, category_id):
     category = Category.objects.get(pk=category_id)

@@ -76,7 +76,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
     'django.contrib.flatpages.middleware.FlatpageFallbackMiddleware',
-    'allauth.account.middleware.AccountMiddleware'
+    'allauth.account.middleware.AccountMiddleware',
+    'news.middleware.MobileOrFullMiddleware',
 ]
 
 ROOT_URLCONF = 'NewsPaper.urls'
@@ -210,3 +211,91 @@ red = redis.Redis(
 CELERY_BROKER_URL = 'redis://localhost:6379/0'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
 CELERY_IMPORTS = ('news.tasks', )
+
+# Настройки логирования
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,  # Отключает существующие логгеры при загрузке конфигурации
+    'style': '{',  # Стиль форматирования логов
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(message)s'  # Формат для логов
+        },
+        'error_format': {
+            'format': '%(asctime)s %(levelname)s %(module)s %(message)s'  # Формат для ошибок
+        }
+    },
+    'filters': {
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',  # Фильтр, требующий DEBUG = True
+        },
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',  # Фильтр, требующий DEBUG = False
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',  # Уровень логирования для консоли (все сообщения)
+            'class': 'logging.StreamHandler',  # Обработчик для вывода в консоль
+            'formatter': 'simple'
+        },
+        'mail_admins': {
+            'level': 'ERROR',  # Уровень логирования для отправки на почту (ошибки и выше)
+            'class': 'django.utils.log.AdminEmailHandler',  # Обработчик для отправки на почту
+            'formatter': 'error_format'
+        },
+        'general_file': {
+            'level': 'INFO',  # Уровень логирования для общего файла (INFO и выше)
+            'class': 'logging.FileHandler',  # Обработчик для записи в файл
+            'filename': 'general.log',  # Имя файла
+            'formatter': 'error_format',
+            'filters': ['require_debug_false']  # Фильтр (требует DEBUG = False)
+        },
+        'errors_file': {
+            'level': 'ERROR',  # Уровень логирования для файла ошибок (ошибки и выше)
+            'class': 'logging.FileHandler',
+            'filename': 'errors.log',
+            'formatter': 'error_format',
+            'filters': ['require_debug_false']
+        },
+        'security_file': {
+            'level': 'INFO',  # Уровень логирования для файла безопасности (INFO и выше)
+            'class': 'logging.FileHandler',
+            'filename': 'security.log',
+            'formatter': 'error_format',
+            'filters': ['require_debug_false']
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],  # Обработчики для логгера django
+            'level': 'DEBUG',  # Уровень логирования
+            'propagate': True,  # Распространять ли логи на родительские логгеры
+        },
+        'django.request': {
+            'handlers': ['mail_admins'],  # Обработчики для логгера django.request
+            'level': 'ERROR',
+            'propagate': False,  # Не распространять логи на родительские логгеры
+        },
+        'django.server': {
+            'handlers': ['errors_file'],  # Обработчики для логгера django.server
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.template': {
+            'handlers': ['errors_file'],  # Обработчики для логгера django.template
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.db.backends': {
+            'handlers': ['errors_file'],  # Обработчики для логгера django.db.backends
+            'level': 'ERROR',
+            'propagate': False,
+        },
+        'django.security': {
+            'handlers': ['security_file'],  # Обработчики для логгера django.security
+            'level': 'INFO',
+            'propagate': False,
+        },
+    }
+}

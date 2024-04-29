@@ -5,6 +5,7 @@ from django.views.generic import (
 )
 
 from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.core.cache import cache
 
 from .forms import PostForm
 from .models import Post
@@ -49,6 +50,17 @@ class NewsDetail(DetailView):
     model = Post
     template_name = 'news_detail.html'
     context_object_name = 'news_detail'
+
+    # Добавляем статью в кэш до её изменения
+    def get_object(self, *args, **kwargs):
+        # Забираем значение по ключу, если его нет, то забирает None.
+        obj = cache.get(f'product-{self.kwargs["pk"]}', None)
+
+        # если объекта нет в кэше, то получаем его и записываем в кэш
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'product-{self.kwargs["pk"]}', obj)
+            return obj
 
 
 class PostCreate(PermissionRequiredMixin, CreateView):
